@@ -1,0 +1,6 @@
+headers = jwt.h
+
+compilerOpts.linux = -I/usr/include -I/usr/include/x86_64-linux-gnu
+compilerOpts.osx = -I/usr/local/Cellar/libjwt/1.13.1/include -I/usr/local/include/
+linkerOpts.osx = -L/usr/local/Cellar/libjwt/1.13.1/lib -ljwt
+linkerOpts.linux = -L/usr/lib -L/usr/lib/x86_64-linux-gnu -ljwt
