@@ -32,7 +32,7 @@ internal class AuthTokenProviderImpl(
     private val tokenIssuerUrl: String
 ) : AuthTokenProvider, SynchronizedObject() {
 
-    private val jwt = GoogleJWTImpl()
+    private val googleJWT = GoogleJWT.create()
 
     private var tokenData: TokenData? = null
 
@@ -51,7 +51,7 @@ internal class AuthTokenProviderImpl(
         expirationTimestamp != null && getTimeMillis() + TOKEN_REFRESH_TIME_BUFFER >= expirationTimestamp
 
     private fun reloadToken() {
-        val jwt = jwt.generate(iss, key)
+        val jwt = googleJWT.generate(iss, key)
         val tokenJsonString = KUrl.forString(tokenIssuerUrl)
             .post("grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=$jwt") as String
         val accessTokenResponse: AccessTokenResponse = Json.decodeFromString(tokenJsonString)
@@ -61,7 +61,7 @@ internal class AuthTokenProviderImpl(
 }
 
 @Serializable
-data class TokenData(val value: String, val expirationTimestamp: Long)
+private data class TokenData(val value: String, val expirationTimestamp: Long)
 
 @Serializable
 data class AccessTokenResponse(
