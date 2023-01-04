@@ -82,11 +82,12 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 implementation("org.jetbrains.kotlinx:atomicfu:0.18.5")
-                implementation("com.paramount.kjwt:kjwt:0.0.1")
                 if (hostOs == "Linux") {
                     implementation("io.github.versi.kurl:kurl:0.0.24")
+                    implementation("com.paramount.kjwt:kjwt:0.0.4")
                 } else {
                     implementation("io.github.versi.kurl:kurl-macosx64:0.0.24")
+                    implementation("com.paramount.kjwt:kjwt-macosx64:0.0.4")
                 }
             }
         }
