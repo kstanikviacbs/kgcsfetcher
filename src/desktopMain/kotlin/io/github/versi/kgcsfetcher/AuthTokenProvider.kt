@@ -10,8 +10,6 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlin.system.getTimeMillis
 
-private const val TOKEN_REFRESH_TIME_BUFFER = 600000
-
 interface AuthTokenProvider {
 
     suspend fun getToken(reset: Boolean = false): String?
@@ -29,7 +27,8 @@ interface AuthTokenProvider {
 internal class AuthTokenProviderImpl(
     private val iss: String,
     private val key: String,
-    private val tokenIssuerUrl: String
+    private val tokenIssuerUrl: String,
+    private val expLeeway: Long = 0
 ) : AuthTokenProvider, SynchronizedObject() {
 
     private val googleJWT = GoogleJWT.create()
@@ -48,7 +47,7 @@ internal class AuthTokenProviderImpl(
     }
 
     private fun shouldResetToken(expirationTimestamp: Long?) =
-        expirationTimestamp != null && getTimeMillis() + TOKEN_REFRESH_TIME_BUFFER >= expirationTimestamp
+        expirationTimestamp != null && getTimeMillis() - expLeeway >= expirationTimestamp
 
     private fun reloadToken() {
         val jwt = googleJWT.generate(iss, key)
