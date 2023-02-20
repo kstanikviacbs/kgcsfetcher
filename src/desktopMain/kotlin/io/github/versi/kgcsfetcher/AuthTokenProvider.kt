@@ -16,8 +16,8 @@ interface AuthTokenProvider {
 
     companion object {
 
-        fun create(iss: String, key: String, tokenIssuerUrl: String): AuthTokenProvider =
-            AuthTokenProviderImpl(iss, key, tokenIssuerUrl)
+        fun create(iss: String, key: String, tokenIssuerUrl: String, expLeeway: Long): AuthTokenProvider =
+            AuthTokenProviderImpl(iss, key, tokenIssuerUrl, expLeeway)
     }
 }
 
