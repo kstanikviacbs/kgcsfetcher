@@ -20,8 +20,7 @@ interface KGCSFetcher {
 
     data class Config(
         val bucketName: String,
-        val iss: String,
-        val key: String
+        val serviceAccount: String
     )
 
     data class ConnectOptions(
@@ -45,8 +44,18 @@ internal class KGSCFetcherImpl(
         transferTimeoutSec = connectOptions.transferTimeoutSec,
         withConnectionSharing = connectOptions.withConnectionSharing
     )
-    private val authTokenProvider = AuthTokenProvider.create(config.iss, config.key, aud, connectOptions.tokenExpLeeway)
     private val fileBasePath = "https://storage.googleapis.com/storage/v1/b/${config.bucketName}/o/"
+    private val authTokenProvider: AuthTokenProvider
+
+    init {
+        val serviceAccount = GCPServiceAccountKey.parse(config.serviceAccount)
+        authTokenProvider = AuthTokenProvider.create(
+            serviceAccount.clientEmail,
+            serviceAccount.privateKey,
+            aud,
+            connectOptions.tokenExpLeeway
+        )
+    }
 
     override suspend fun fetchFile(urlEncodedObjectName: String): ByteArray {
         val token = authTokenProvider.getToken()

@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("multiplatform") version "1.7.20"
     kotlin("plugin.serialization") version "1.7.20"
@@ -7,7 +5,7 @@ plugins {
 }
 
 group = "io.github.versi.kgcsfetcher"
-version = "0.0.5"
+version = "0.0.6"
 
 repositories {
     mavenCentral()
