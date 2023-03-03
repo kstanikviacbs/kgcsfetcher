@@ -3,6 +3,7 @@ package io.github.versi.kgcsfetcher
 import io.github.versi.kgcsfetcher.jwt.aud
 import io.github.versi.kurl.KUrl
 import io.github.versi.kurl.KUrlOptions
+import io.github.versi.kurl.CUrlUnauthorizedException
 
 interface KGCSFetcher {
 
@@ -74,12 +75,23 @@ internal class KGSCFetcherImpl(
     private val fileBasePath = "https://storage.googleapis.com/storage/v1/b/${bucketName}/o/"
 
     override suspend fun fetchFile(urlEncodedObjectName: String): ByteArray {
-        val token = authTokenProvider.getToken()
+        return fetchFile(urlEncodedObjectName, refreshToken = false)
+    }
+
+    private suspend fun fetchFile(urlEncodedObjectName: String, refreshToken: Boolean): ByteArray {
+        val token = authTokenProvider.getToken(refreshToken)
         val headers = listOf("Authorization: Bearer $token")
         val fileUrl = "$fileBasePath$urlEncodedObjectName?alt=media"
         val curl = KUrl.forBytes(fileUrl, kUrlOptions)
-        try {
-            return curl.fetch(headers = headers) as ByteArray
+        return try {
+            curl.fetch(headers = headers) as ByteArray
+        } catch (unauthorizedException: CUrlUnauthorizedException) {
+            // attempts once again with refreshed token in case 401 received
+            if (!refreshToken) {
+                fetchFile(urlEncodedObjectName, refreshToken = true)
+            } else {
+                throw unauthorizedException
+            }
         } finally {
             curl.close()
         }

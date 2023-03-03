@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.versi.kgcsfetcher"
-version = "0.0.7"
+version = "0.0.8"
 
 repositories {
     mavenCentral()
@@ -82,10 +82,10 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 implementation("org.jetbrains.kotlinx:atomicfu:0.18.5")
                 if (hostOs == "Linux") {
-                    implementation("io.github.versi.kurl:kurl:0.0.24")
+                    implementation("io.github.versi.kurl:kurl:0.0.25")
                     implementation("com.paramount.kjwt:kjwt:0.0.5")
                 } else {
-                    implementation("io.github.versi.kurl:kurl-macosx64:0.0.24")
+                    implementation("io.github.versi.kurl:kurl-macosx64:0.0.25")
                     implementation("com.paramount.kjwt:kjwt-macosx64:0.0.5")
                 }
             }
