@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.versi.kgcsfetcher"
-version = "0.0.8"
+version = "0.0.9"
 
 repositories {
     mavenCentral()
@@ -39,30 +39,8 @@ publishing {
 }
 
 kotlin {
-    jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
-        }
-        withJava()
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
-    }
-    js(BOTH) {
-        browser {
-            commonWebpackConfig {
-                cssSupport.enabled = true
-            }
-        }
-    }
-    val hostOs = System.getProperty("os.name")
-    val isMingwX64 = hostOs.startsWith("Windows")
-    when {
-        hostOs == "Mac OS X" -> macosX64()
-        hostOs == "Linux" -> linuxX64()
-        isMingwX64 -> mingwX64()
-        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
-    }
+    linuxX64()
+    macosX64()
 
     sourceSets {
         val commonMain by getting
@@ -71,49 +49,31 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
-        val jvmMain by getting
-        val jvmTest by getting
-        val jsMain by getting
-        val jsTest by getting
         val desktopMain by creating {
             dependsOn(commonMain)
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 implementation("org.jetbrains.kotlinx:atomicfu:0.18.5")
-                if (hostOs == "Linux") {
-                    implementation("io.github.versi.kurl:kurl:0.0.25")
-                    implementation("com.paramount.kjwt:kjwt:0.0.5")
-                } else {
-                    implementation("io.github.versi.kurl:kurl-macosx64:0.0.25")
-                    implementation("com.paramount.kjwt:kjwt-macosx64:0.0.5")
-                }
+                implementation("io.github.versi.kurl:kurl:0.0.27")
+                implementation("com.paramount.kjwt:kjwt:0.0.6")
             }
         }
         val desktopTest by creating {
             dependsOn(commonTest)
             dependsOn(desktopMain)
         }
-        when {
-            hostOs == "Mac OS X" -> {
-                val macosX64Main by getting {
-                    dependsOn(desktopMain)
-                }
-            }
-
-            hostOs == "Linux" -> {
-                val linuxX64Main by getting {
-                    dependsOn(desktopMain)
-                }
-            }
-
-            isMingwX64 -> {
-                val mingwX64Main by getting {
-                    dependsOn(desktopMain)
-                }
-            }
-
-            else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
+        val linuxX64Main by getting {
+            dependsOn(desktopMain)
+        }
+        val linuxX64Test by getting {
+            dependsOn(desktopTest)
+        }
+        val macosX64Main by getting {
+            dependsOn(desktopMain)
+        }
+        val macosX64Test by getting {
+            dependsOn(desktopTest)
         }
     }
 }
